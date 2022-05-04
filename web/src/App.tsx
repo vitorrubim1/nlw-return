@@ -1,9 +1,5 @@
-function App() {
-  return (
-    <button className="bg-violet-500 px-2" type="button">
-      Enviar
-    </button>
-  );
-}
+import { Widget } from "./components/Widget";
 
-export { App };
+export function App() {
+  return <Widget />;
+}
