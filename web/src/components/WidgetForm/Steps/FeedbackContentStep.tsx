@@ -7,19 +7,37 @@ import { feedbackTypes } from "../../../hooks/useFeedback/dtos";
 
 import { CloseButton } from "../../CloseButton";
 import { ScreenshotButton } from "../ScreenshotButton";
+import { api } from "../../../services/api";
+import { Loading } from "../../Loading";
 
 export function FeedbackContentStep() {
   const { feedbackType, screenshot, setFeedbackType, setFeedbackSent } =
     useFeedback();
 
   const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const feedbackTypeInfo = feedbackTypes[feedbackType!];
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
+    console.log("caiu aqui");
     event?.preventDefault();
 
-    setFeedbackSent(true);
+    try {
+      setLoading(true);
+
+      await api.post("/feedbacks", {
+        type: feedbackType,
+        comment,
+        screenshot,
+      });
+
+      setFeedbackSent(true);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -59,9 +77,9 @@ export function FeedbackContentStep() {
           <button
             type="submit"
             className="p-2 bg-brand-500 rounded-md border-transparent flex-1 flex justify-center items-center text-sm hover:bg-brand-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 focus:ring-brand-500 transition-colors disabled:opacity-50 disabled:hover:bg-brand-500"
-            disabled={comment.length === 0}
+            disabled={comment.length === 0 || loading}
           >
-            Enviar feedback
+            {loading ? <Loading /> : "Enviar feedback"}
           </button>
         </footer>
       </form>
